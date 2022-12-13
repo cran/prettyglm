@@ -9,12 +9,16 @@ pretty_relativities(
   model_object,
   plot_approx_ci = TRUE,
   relativity_transform = "exp(estimate)-1",
+  relativity_label = "Relativity",
   ordering = NULL,
   plot_factor_as_numeric = FALSE,
   width = 800,
   height = 500,
-  return_data = FALSE,
-  ylabel = "Relativity"
+  iteractionplottype = NULL,
+  facetorcolourby = NULL,
+  upper_percentile_to_cut = 0.01,
+  lower_percentile_to_cut = 0,
+  spline_seperator = NULL
 )
 }
 \arguments{
@@ -26,7 +30,9 @@ pretty_relativities(
 
 \item{relativity_transform}{String of the function to be applied to the model estimate to calculate the relativity, for example: 'exp(estimate)'. Default is for relativity to be 'exp(estimate)-1'.}
 
-\item{ordering}{Type III statistical test to perform. Default is none. Options are 'Wald' or 'LR'. Warning 'LR' can be computationally expensive. Test performed via \link[car]{Anova}}
+\item{relativity_label}{String of label to give to relativity column if you want to change the title to your use case, some users may prefer to refer to this as odds ratio.}
+
+\item{ordering}{Option to change the ordering of categories on the x axis, only for discrete categories. Default to the ordering of the fitted factor. Other options are: 'alphabetical', 'Number of records', 'Average Value'}
 
 \item{plot_factor_as_numeric}{Set to TRUE to return \link[base]{data.frame} instead of creating \link[knitr]{kable}.}
 
@@ -34,12 +40,18 @@ pretty_relativities(
 
 \item{height}{Height of plot}
 
-\item{return_data}{Set to TRUE to return data set instead of plot}
+\item{iteractionplottype}{If plotting the relativity for an interaction variable you can "facet" or "colour" by one of the interaction variables. Defaults to null.}
 
-\item{ylabel}{Label for yaxis of relativity plot, some users may prefer to refer to this as log odds}
+\item{facetorcolourby}{If iteractionplottype is not Null, then this is the variable in the interaction you want to colour or facet by.}
+
+\item{upper_percentile_to_cut}{For continuous variables this is what percentile to exclude from the upper end of the distribution. Defaults to 0.01, so the maximum percentile of the variable in the plot will be 0.99. Cutting off some of the distribution can help the views if outlier's are present in the data.}
+
+\item{lower_percentile_to_cut}{For continuous variables this is what percentile to exclude from the lower end of the distribution. Defaults to 0.01, so the mimimum percentile of the variable in the plot will be 0.01. Cutting off some of the distribution can help the views if outlier's are present in the data.}
+
+\item{spline_seperator}{string of the spline separator. For example AGE_0_25 would be "_".}
 }
 \value{
-\link[knitr]{kable} if return_data = FALSE. \link[base]{data.frame} if return_data = TRUE.
+plotly plot of fitted relativities.
 }
 \description{
 Creates a pretty html plot of model relativities including base Levels.
@@ -48,25 +60,66 @@ Creates a pretty html plot of model relativities including base Levels.
 library(dplyr)
 library(prettyglm)
 data('titanic')
+
 columns_to_factor <- c('Pclass',
                        'Sex',
                        'Cabin',
                        'Embarked',
                        'Cabintype',
                        'Survived')
+meanage <- base::mean(titanic$Age, na.rm=TRUE)
+
 titanic  <- titanic  \%>\%
-  dplyr::mutate_at(columns_to_factor, list(~factor(.)))
-survival_model <- stats::glm(Survived ~
-                              Pclass +
-                              Sex +
-                              Age +
-                              Fare +
-                              Embarked +
-                              SibSp +
-                              Parch +
-                              Cabintype,
-                             data = titanic,
-                             family = binomial(link = 'logit'))
-pretty_relativities(feature_to_plot = 'Pclass',
-                    model_object = survival_model)
+  dplyr::mutate_at(columns_to_factor, list(~factor(.))) \%>\%
+  dplyr::mutate(Age =base::ifelse(is.na(Age)==TRUE,meanage,Age)) \%>\%
+  dplyr::mutate(Age_0_25 = prettyglm::splineit(Age,0,25),
+                Age_25_50 = prettyglm::splineit(Age,25,50),
+                Age_50_120 = prettyglm::splineit(Age,50,120)) \%>\%
+  dplyr::mutate(Fare_0_250 = prettyglm::splineit(Fare,0,250),
+                Fare_250_600 = prettyglm::splineit(Fare,250,600))
+
+survival_model3 <- stats::glm(Survived ~
+                                Pclass:Embarked +
+                                Age_0_25  +
+                                Age_25_50 +
+                                Age_50_120  +
+                                Sex:Fare_0_250 +
+                                Sex:Fare_250_600 +
+                                SibSp +
+                                Parch +
+                                Cabintype,
+                              data = titanic,
+                              family = binomial(link = 'logit'))
+
+# categorical factor
+pretty_relativities(feature_to_plot = 'Cabintype',
+                    model_object = survival_model3)
+
+# continuous factor
+pretty_relativities(feature_to_plot = 'Parch',
+                    model_object = survival_model3)
+
+# splined continuous factor
+pretty_relativities(feature_to_plot = 'Age',
+                    model_object = survival_model3,
+                    spline_seperator = '_',
+                    upper_percentile_to_cut = 0.01,
+                    lower_percentile_to_cut = 0.01)
+
+# factor factor interaction
+pretty_relativities(feature_to_plot = 'Pclass:Embarked',
+                    model_object = survival_model3,
+                    iteractionplottype = 'colour',
+                    facetorcolourby = 'Pclass')
+
+# Continuous spline and categorical by colour
+pretty_relativities(feature_to_plot = 'Sex:Fare',
+                    model_object = survival_model3,
+                    spline_seperator = '_')
+
+# Continuous spline and categorical by facet
+pretty_relativities(feature_to_plot = 'Sex:Fare',
+                    model_object = survival_model3,
+                    spline_seperator = '_',
+                    iteractionplottype = 'facet')
 }

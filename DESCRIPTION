@@ -1,28 +1,31 @@
 Type: Package
 Package: prettyglm
 Title: Pretty Summaries of Generalized Linear Model Coefficients
-Version: 0.1.0
+Version: 1.0.0
 Authors@R: 
-    person(given = "Jared",
-           family = "Fowler",
-           role = c("cre", "aut"),
-           email = "jared.fowler8@gmail.com")
+    person("Jared", "Fowler", , "jared.fowler8@gmail.com", role = c("cre", "aut"))
 Maintainer: Jared Fowler <jared.fowler8@gmail.com>
-Description: One of the main advantages of using Generalised
-    Linear Models is their interpretability.  The goal of 'prettyglm' is to
-    provide a set of functions which easily create beautiful coefficient
-    summaries which can readily be shared and explained.
+Description: One of the main advantages of using Generalised Linear Models
+    is their interpretability.  The goal of 'prettyglm' is to provide a
+    set of functions which easily create beautiful coefficient summaries
+    which can readily be shared and explained. 'prettyglm' helps users
+    create coefficient summaries which include categorical base levels,
+    variable importance and type III p.values. 'prettyglm' also creates
+    beautiful relativity plots for categorical, continuous and splined
+    coefficients.
 License: GPL-3
+URL: https://jared-fowler.github.io/prettyglm/
 Depends: R (>= 3.5.0)
-Imports: broom, car, dplyr, forcats, kableExtra, knitr, plotly,
-        stringr, tibble, tidycat, tidyr, tidyselect, vip
+Imports: broom, car, dplyr, forcats, kableExtra, knitr, methods,
+        plotly, RColorBrewer, stringr, tibble, tidycat, tidyr,
+        tidyselect, vip
 Suggests: rmarkdown, testthat
 VignetteBuilder: knitr
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.1.1
 NeedsCompilation: no
-Packaged: 2021-06-23 11:08:37 UTC; Jared
+Packaged: 2022-12-13 10:39:14 UTC; Jared
 Author: Jared Fowler [cre, aut]
 Repository: CRAN
-Date/Publication: 2021-06-24 07:40:05 UTC
+Date/Publication: 2022-12-13 13:20:02 UTC
