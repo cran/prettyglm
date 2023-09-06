@@ -1,7 +1,7 @@
 Type: Package
 Package: prettyglm
 Title: Pretty Summaries of Generalized Linear Model Coefficients
-Version: 1.0.0
+Version: 1.0.1
 Authors@R: 
     person("Jared", "Fowler", , "jared.fowler8@gmail.com", role = c("cre", "aut"))
 Maintainer: Jared Fowler <jared.fowler8@gmail.com>
@@ -15,7 +15,7 @@ Description: One of the main advantages of using Generalised Linear Models
     coefficients.
 License: GPL-3
 URL: https://jared-fowler.github.io/prettyglm/
-Depends: R (>= 3.5.0)
+Depends: R (>= 4.1.0)
 Imports: broom, car, dplyr, forcats, kableExtra, knitr, methods,
         plotly, RColorBrewer, stringr, tibble, tidycat, tidyr,
         tidyselect, vip
@@ -23,9 +23,9 @@ Suggests: rmarkdown, testthat
 VignetteBuilder: knitr
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.1.1
+RoxygenNote: 7.2.3
 NeedsCompilation: no
-Packaged: 2022-12-13 10:39:14 UTC; Jared
+Packaged: 2023-09-06 00:14:11 UTC; Jared
 Author: Jared Fowler [cre, aut]
 Repository: CRAN
-Date/Publication: 2022-12-13 13:20:02 UTC
+Date/Publication: 2023-09-06 08:40:02 UTC
